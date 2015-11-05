@@ -14,12 +14,12 @@ local redis_port = ngx.var.redis_port
 local function calc_status(premature)
     local rds, err = redis:new()
     local ok, err = rds:connect(redis_host, tonumber(redis_port))
-    local status_key = "loadb:"..host..":status:"..status
-    local sum_key = "loadb:"..host..":response:sum"
+    local status_key = "loadb:"..host..":status"
+    local seconds_key = "loadb:"..host..":time"
     local total_key = "loadb:"..host..":count"
-    rds:incr(status_key)
+    rds:hincrby(status_key, status, 1)
     rds:incr(total_key)
-    rds:incrbyfloat(sum_key, tonumber(seconds))
+    rds:incrbyfloat(seconds_key, tonumber(seconds))
 end
 
 local ok, err = ngx.timer.at(0, calc_status)
