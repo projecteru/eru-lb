@@ -1,5 +1,5 @@
 local redis_c = require "resty.redis"
-
+local config = require "config"
 
 local ok, new_tab = pcall(require, "table.new")
 if not ok or type(new_tab) ~= "function" then
@@ -95,7 +95,7 @@ end
 -- change connect address as you need
 function _M.connect_mod( self, redis )
     redis:set_timeout(self.timeout)
-    return redis:connect(ngx.var.redis_host, ngx.var.redis_port)
+    return redis:connect(config.REDIS_HOST, config.REDIS_PORT)
 end
 
 

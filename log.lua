@@ -1,4 +1,4 @@
-local redis = require "resty.redis"
+local redis = require "redtool"
 
 if ngx.var.backend == '' then
     return
@@ -8,12 +8,8 @@ local host = ngx.var.host
 local status = ngx.var.upstream_status
 local seconds = ngx.var.upstream_response_time
 
-local redis_host = ngx.var.redis_host
-local redis_port = ngx.var.redis_port
-
 local function calc_status(premature)
-    local rds, err = redis:new()
-    local ok, err = rds:connect(redis_host, tonumber(redis_port))
+    local rds = redis:new()
     local status_key = "loadb:"..host..":status"
     local seconds_key = "loadb:"..host..":time"
     local total_key = "loadb:"..host..":count"
