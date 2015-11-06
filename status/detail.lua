@@ -10,38 +10,54 @@ local function calc_status()
     local status_key = "loadb:"..host..":status"
     local seconds_key = "loadb:"..host..":time"
     local total_key = "loadb:"..host..":count"
+    local wrong_key = "loadb:"..host..":wrong"
+    local right_key = "loadb:"..host..":right"
+    local result = {}
 
     local total, err = rds:get(total_key)
-    if err then
-        return nil, nil, nil, err
+    if err or not total then
+        return nil, err
     end
     local seconds, err = rds:get(seconds_key)
-    if err then
-        return nil, nil, nil, err
+    if err or not seconds then
+        return nil, err
     end
     local status, err = rds:hgetall(status_key)
-    if err then
-        return nil, nil, nil, err
+    if err or not status then
+        return nil, err
     end
-    return total, seconds, status, nil
+    local right, err = rds:get(right_key)
+    if err then
+        return nil, err
+    end
+    local wrong, err = rds:get(wrong_key)
+    if err then
+        return nil, err
+    end
+    result["status"] = status
+    result["total"] = tonumber(total)
+    result["seconds"] = tonumber(seconds)
+    result["wrong"] = tonumber(wrong) and tonumber(wrong) or 0
+    result["right"] = tonumber(right) and tonumber(right) or 0
+    return result, nil
 end
 
-local total, seconds, status, err = calc_status()
+local result, err = calc_status()
 if err then
     ngx.log(ngx.ERR, err)
     return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
 end
 
-if not total or not seconds or not status then
-    ngx.say("no data")
-    return
+local per_resp_time = result["seconds"] / result["right"]
+local error_percent = result["wrong"] / result["total"]
+local right_percent = result["right"] / result["total"]
+
+ngx.say("total response: ", result["total"])
+ngx.say("error response: ", result["wrong"])
+ngx.say("right response: ", result["right"])
+ngx.say("error percent: ", error_percent)
+ngx.say("right percent: ", right_percent)
+ngx.say("right avg response time: ", per_resp_time)
+for i=1,table.getn(result["status"]),2 do
+    ngx.say("status ", result["status"][i], " num: ", result["status"][i+1])
 end
-
-local per_resp = tonumber(seconds) / tonumber(total)
-
-ngx.say("total response: ", total)
-ngx.say("per response time: ", per_resp)
-for i=1,table.getn(status),2 do
-    ngx.say("status ", status[i], " num: ", status[i+1])
-end
-
