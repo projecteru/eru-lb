@@ -34,11 +34,18 @@ local function calc_status()
     if err then
         return nil, err
     end
-    result["status"] = status
+    result["status"] = {}
+    for i=1,#status,2 do
+        result["status"][status[i]] = status[i + 1]
+    end
     result["total"] = tonumber(total)
     result["seconds"] = tonumber(seconds)
     result["wrong"] = tonumber(wrong) and tonumber(wrong) or 0
     result["right"] = tonumber(right) and tonumber(right) or 0
+
+    result["per_resp_time"] = result["seconds"] / result["right"]
+    result["error_percent"] = result["wrong"] / result["total"]
+    result["right_percent"] = result["right"] / result["total"]
     return result, nil
 end
 
@@ -48,16 +55,4 @@ if err then
     return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
 end
 
-local per_resp_time = result["seconds"] / result["right"]
-local error_percent = result["wrong"] / result["total"]
-local right_percent = result["right"] / result["total"]
-
-ngx.say("total response: ", result["total"])
-ngx.say("error response: ", result["wrong"])
-ngx.say("right response: ", result["right"])
-ngx.say("error percent: ", error_percent)
-ngx.say("right percent: ", right_percent)
-ngx.say("right avg response time: ", per_resp_time)
-for i=1,table.getn(result["status"]),2 do
-    ngx.say("status ", result["status"][i], " num: ", result["status"][i+1])
-end
+ngx.say(cjson.encode(result))
