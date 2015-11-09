@@ -1,7 +1,7 @@
 local redis = require "redtool"
 
 if not ngx.var.arg_host then
-    return ngx.exit(ngx.HTTP_NOT_FOUND)
+    ngx.exit(ngx.HTTP_NOT_FOUND)
 end
 
 local function calc_status()
@@ -52,7 +52,7 @@ end
 local result, err = calc_status()
 if err then
     ngx.log(ngx.ERR, err)
-    return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
+    ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
 end
 
 ngx.say(cjson.encode(result))
