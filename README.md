@@ -21,34 +21,46 @@ Eru load balance
 
 We will offer dockerfile ASAP.
 
-## Usage
+## API
 
-First of all, you should bind domain and backend in redis.
+1. Add servername.
 
 ```
-SET domain backend_name
+http PUT :8080/domain backend=aaa name=vbox
 ```
 
-1. Add/Update a backend. if it not exists, the module will create it automatically.
+2. Delete servername.
+
+```
+http DELETE :8080/domain name=vbox
+```
+
+3. Add/Update a backend. if it not exists, the module will create it automatically.
 
 ```
 http PUT :8080/upstreams/update backend=aaa servers:='["server 127.0.0.1:5000 weight=2;", "server 127.0.0.1:4000;"]'
 ```
 
-2. Delete a backend.
+4. Delete a backend.
 
 ```
 http DELETE :8080/upstreams/delete backend=aaa
 ```
 
-3. Show backends detail.
+5. Show backends detail.
 
 ```
 http :8080/upstreams/detail
 ```
 
-4. Show upstream response detail by domain.
+6. Show upstream response detail by domain.
 
 ```
-http://127.0.0.1:8080/backend/status?host=domain
+http :8080/backend/status?host=domain
+```
+
+7. Show servernames list.
+
+```
+http :8080/domain
 ```
