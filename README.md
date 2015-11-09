@@ -23,43 +23,43 @@ We will offer dockerfile ASAP.
 
 ## API
 
-1. Add servername.
+* Add servername.
 
 ```
 http PUT :8080/domain backend=aaa name=vbox
 ```
 
-2. Delete servername.
+* Delete servername.
 
 ```
 http DELETE :8080/domain name=vbox
 ```
 
-3. Add/Update a backend. if it not exists, the module will create it automatically.
+* Add/Update a backend. if it not exists, the module will create it automatically.
 
 ```
 http PUT :8080/upstreams/update backend=aaa servers:='["server 127.0.0.1:5000 weight=2;", "server 127.0.0.1:4000;"]'
 ```
 
-4. Delete a backend.
+* Delete a backend.
 
 ```
 http DELETE :8080/upstreams/delete backend=aaa
 ```
 
-5. Show backends detail.
+* Show backends detail.
 
 ```
 http :8080/upstreams/detail
 ```
 
-6. Show upstream response detail by domain.
+* Show upstream response detail by domain.
 
 ```
 http :8080/backend/status?host=domain
 ```
 
-7. Show servernames list.
+* Show servernames list.
 
 ```
 http :8080/domain
