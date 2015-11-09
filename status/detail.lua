@@ -1,12 +1,12 @@
 local redis = require "redtool"
+local utils = require "utils"
 
 if not ngx.var.arg_host then
     ngx.exit(ngx.HTTP_NOT_FOUND)
 end
 
-local function calc_status()
+local function calc_status(host)
     local rds = redis:new()
-    local host = ngx.var.arg_host
     local status_key = "loadb:"..host..":status"
     local seconds_key = "loadb:"..host..":time"
     local total_key = "loadb:"..host..":count"
@@ -49,7 +49,10 @@ local function calc_status()
     return result, nil
 end
 
-local result, err = calc_status()
+local host = ngx.var.arg_host
+utils.get_from_servernames(host)
+
+local result, err = calc_status(host)
 if err then
     ngx.log(ngx.ERR, err)
     ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
