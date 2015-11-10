@@ -61,9 +61,8 @@ def test_eru_lb(addr):
     assert(r.status_code == requests.codes.bad_gateway)
 
     # store backend after test
-    url = '%s/upstreams/update' % base_url
+    url = '%s/upstream' % base_url
     test_update_upstream(url, headers)
-    url = '%s/upstreams/detail' % base_url
     test_upstream_detail(url, headers)
 
     rs = {'8088':0, '8089':0}
@@ -76,7 +75,7 @@ def test_eru_lb(addr):
     url = '%s/domain' % base_url
     test_delete_domain(url, headers)
 
-    url = '%s/upstreams/delete' % base_url
+    url = '%s/upstream' % base_url
     test_delete_upstream(url, headers)
 
 def test_delete_upstream(url, headers):

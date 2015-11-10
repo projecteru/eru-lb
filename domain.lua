@@ -33,11 +33,11 @@ local function get()
 end
 
 if ngx.var.request_method == 'PUT' then
-    return add()
+    add()
 elseif ngx.var.request_method == 'DELETE' then
-    return delete()
+    delete()
 elseif ngx.var.request_method == 'GET' then
-    return get()
+    get()
 end
 ngx.exit(ngx.HTTP_BAD_REQUEST)
 
