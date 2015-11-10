@@ -1,7 +1,7 @@
 local _M = {}
 
-_M.REDIS_HOST = "127.0.0.1"
-_M.REDIS_PORT = "6379"
+_M.REDIS_HOST = os.getenv("REDIS_HOST")
+_M.REDIS_PORT = os.getenv("REDIS_PORT")
 _M.BAD_GATEWAY = "502"
 
 return _M
