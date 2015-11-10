@@ -9,6 +9,7 @@ local function add()
         if err ~= "exists" then
             ngx.exit(ngx.HTTP_BAD_REQUEST)
         end
+        ngx.exit(ngx.HTTP_OK)
     else
         ngx.say(cjson.encode({msg = 'ok'}))
         ngx.exit(ngx.HTTP_OK)
@@ -21,6 +22,7 @@ local function delete()
     -- TODO check err
     -- TODO clean lrucache
     ngx.say(cjson.encode({msg = 'ok'}))
+    ngx.exit(ngx.HTTP_OK)
 end
 
 local function get()

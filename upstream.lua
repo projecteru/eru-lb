@@ -47,6 +47,7 @@ local function detail()
         end
     end
     ngx.say(cjson.encode(result))
+    ngx.exit(ngx.HTTP_OK)
 end
 
 if ngx.var.request_method == 'PUT' then
