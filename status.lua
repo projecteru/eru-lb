@@ -43,9 +43,9 @@ local function calc_status(host)
     result["wrong"] = tonumber(wrong) and tonumber(wrong) or 0
     result["right"] = tonumber(right) and tonumber(right) or 0
 
-    result["per_resp_time"] = result["seconds"] / result["right"]
-    result["error_percent"] = result["wrong"] / result["total"]
-    result["right_percent"] = result["right"] / result["total"]
+    result["error_percent"] = result["total"] and result["wrong"] / result["total"] or 0
+    result["right_percent"] = result["total"] and result["right"] / result["total"] or 0
+    result["per_resp_time"] = result["right"] and result["seconds"] / result["right"] or 0
     return result, nil
 end
 
