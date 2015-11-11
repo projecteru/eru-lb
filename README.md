@@ -6,6 +6,15 @@ Eru load balance
 1. [Openresty](http://openresty.org)
 2. [ngx_http_dyups_module](https://github.com/yzprofile/ngx_http_dyups_module)
 
+## Performance
+
+ab test eru-agent debug pprof API
+
+10K requests and 100 concurrency
+
+Direct: 11904.49 requests / sec (by 24 core)
+Proxy: 8100 requests / sec (by 8 core config)
+
 ## Feature
 
 1. Dynamically add/remove/update backend (by ngx_http_dyups_module, part of [tengine](http://tengine.taobao.org/)).
