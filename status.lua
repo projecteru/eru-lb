@@ -2,57 +2,66 @@ local redis = require "redtool"
 local utils = require "utils"
 
 if not ngx.var.arg_host then
-    ngx.exit(ngx.HTTP_NOT_FOUND)
+    ngx.exit(ngx.HTTP_BAD_REQUEST)
 end
 
 local function calc_status(host)
     local rds = redis:new()
-    local status_key = "loadb:"..host..":status"
-    local seconds_key = "loadb:"..host..":time"
-    local total_key = "loadb:"..host..":count"
-    local wrong_key = "loadb:"..host..":wrong"
-    local right_key = "loadb:"..host..":right"
+    local status_key = "erulb:"..host..":status"
+    local cost_key = "erulb:"..host..":cost"
+    local total_key = "erulb:"..host..":count"
+    local miss_key = "erulb:"..host..":miss"
+    local hit_key = "erulb:"..host..":hit"
+    local wrong_key = "erulb:"..host..":wrong"
+    local right_key = "erulb:"..host..":right"
     local result = {}
 
     local total, err = rds:get(total_key)
     if err or not total then
         return nil, err
     end
-    local seconds, err = rds:get(seconds_key)
-    if err or not seconds then
-        return nil, err
+    local miss, err = rds:get(miss_key)
+    if err or not miss then
+        miss = 0
+    end
+    local cost, err = rds:get(cost_key)
+    if err or not cost then
+        cost = 0
     end
     local status, err = rds:hgetall(status_key)
     if err or not status then
-        return nil, err
+        status = {}
+    end
+    local hit, err = rds:get(hit_key)
+    if err or not hit then
+        hit = 0
     end
     local right, err = rds:get(right_key)
-    if err then
-        return nil, err
+    if err or not right then
+        right = 0
     end
     local wrong, err = rds:get(wrong_key)
-    if err then
-        return nil, err
+    if err or not wrong then
+        wrong = 0
     end
     result["status"] = {}
     for i=1,#status,2 do
         result["status"][status[i]] = status[i + 1]
     end
     result["total"] = tonumber(total)
-    result["seconds"] = tonumber(seconds)
-    result["wrong"] = tonumber(wrong) and tonumber(wrong) or 0
-    result["right"] = tonumber(right) and tonumber(right) or 0
+    result["cost"] = tonumber(cost)
+    result["miss"] = tonumber(miss)
+    result["hit"] = tonumber(hit)
+    result["wrong"] = tonumber(wrong)
+    result["right"] = tonumber(right)
 
     result["per_resp_time"] = 0
-    if result["right"] ~= 0 then
-        result["per_resp_time"] = result["seconds"] / result["right"]
-    end
-
     result["error_percent"] = 0
-    result["right_percent"] = 0
-    if result["total"] ~= 0 then
-        result["error_percent"] = result["wrong"] / result["total"]
-        result["right_percent"] = result["right"] / result["total"]
+    result["ok_percent"] = 0
+    if result["hit"] ~= 0 then
+        result["per_resp_time"] = result["cost"] / result["hit"]
+        result["error_percent"] = result["wrong"] / result["hit"]
+        result["ok_percent"] = result["right"] / result["hit"]
     end
     return result, nil
 end

@@ -1,38 +1,40 @@
 local redis = require "redtool"
-local upstream = require "ngx.upstream"
 local config = require "config"
+local upstream = require "ngx.upstream"
 
-local host = ngx.var.host
 if ngx.var.backend == "" then
-    ngx.log(ngx.ERR, "invalid domain: ", host)
+    ngx.log(ngx.ERR, "invalid domain: ", ngx.var.host)
     return
 end
 
-local _, err = upstream.get_servers(ngx.var.backend)
-local status = config.BAD_GATEWAY
-local seconds = 0.0
-if err then
-    ngx.log(ngx.ERR, "no backend: ", host)
-else
-    status = ngx.var.upstream_status
-    seconds = tonumber(ngx.var.upstream_response_time)
-end
+local host = ngx.var.host
+local status = ngx.var.upstream_status
+local cost = tonumber(ngx.var.upstream_response_time)
 
 local function calc_status(premature)
     local rds = redis:new()
-    local status_key = "loadb:"..host..":status"
-    local seconds_key = "loadb:"..host..":time"
-    local total_key = "loadb:"..host..":count"
-    local wrong_key = "loadb:"..host..":wrong"
-    local right_key = "loadb:"..host..":right"
+    local status_key = "erulb:"..host..":status"
+    local cost_key = "erulb:"..host..":cost"
+    local total_key = "erulb:"..host..":count"
+    local miss_key = "erulb:"..host..":miss"
+    local hit_key = "erulb:"..host..":hit"
+    local wrong_key = "erulb:"..host..":wrong"
+    local right_key = "erulb:"..host..":right"
+
     rds:incr(total_key)
+    if not status then
+        rds:incr(miss_key)
+        return
+    end
+
+    rds:incr(hit_key)
     rds:hincrby(status_key, status, 1)
-    if tonumber(status) > 399 then
+    if tonumber(status) > 499 then
         rds:incr(wrong_key)
     else
         rds:incr(right_key)
     end
-    rds:incrbyfloat(seconds_key, seconds)
+    rds:incrbyfloat(cost_key, cost)
 end
 
 local ok, err = ngx.timer.at(0, calc_status)
