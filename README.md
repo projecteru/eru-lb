@@ -47,19 +47,19 @@ http DELETE :8080/domain name=vbox
 * Add/Update a backend. if it not exists, the module will create it automatically.
 
 ```
-http PUT :8080/upstreams/update backend=aaa servers:='["server 127.0.0.1:5000 weight=2;", "server 127.0.0.1:4000;"]'
+http PUT :8080/upstreams backend=aaa servers:='["server 127.0.0.1:5000 weight=2;", "server 127.0.0.1:4000;"]'
 ```
 
 * Delete a backend.
 
 ```
-http DELETE :8080/upstreams/delete backend=aaa
+http DELETE :8080/upstreams backend=aaa
 ```
 
 * Show backends detail.
 
 ```
-http :8080/upstreams/detail
+http :8080/upstreams
 ```
 
 * Show upstream response detail by domain.
@@ -72,4 +72,23 @@ http :8080/backend/status?host=domain
 
 ```
 http :8080/domain
+
+```
+
+* Add analysis hosts.
+
+```
+http PUT :8080/analysis hosts:='["domain1", "domain2"]'
+```
+
+* Delete analysis host
+
+```
+http DELETE :8080/analysis host=domain
+```
+
+* Get analysis hosts
+
+```
+http :8080/analysis
 ```
