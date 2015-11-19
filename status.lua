@@ -5,6 +5,10 @@ if not ngx.var.arg_host then
     ngx.exit(ngx.HTTP_BAD_REQUEST)
 end
 
+if not utils.check_if_analysis(ngx.var.arg_host) then
+    ngx.exit(ngx.HTTP_BAD_REQUEST)
+end
+
 local function calc_status(host)
     local rds = redis:new()
     local status_key = "erulb:"..host..":status"

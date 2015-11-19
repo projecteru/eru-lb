@@ -1,3 +1,4 @@
+local utils = require "utils"
 local redis = require "redtool"
 local config = require "config"
 local upstream = require "ngx.upstream"
@@ -12,6 +13,9 @@ local status = ngx.var.upstream_status
 local cost = tonumber(ngx.var.upstream_response_time)
 
 local function calc_status(premature)
+    if not utils.check_if_analysis(host) then
+        return
+    end
     local rds = redis:new()
     local status_key = "erulb:"..host..":status"
     local cost_key = "erulb:"..host..":cost"

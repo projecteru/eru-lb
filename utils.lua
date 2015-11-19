@@ -1,5 +1,6 @@
 local _M = {}
 
+local analysis = ngx.shared.analysis
 local servernames = ngx.shared.servernames
 
 function _M.read_data()
@@ -18,6 +19,14 @@ function _M.get_from_servernames(host)
         ngx.exit(ngx.HTTP_NOT_FOUND)
     end
     return value
+end
+
+function _M.check_if_analysis(host)
+    local value = analysis:get(host)
+    if not value then
+        return false
+    end
+    return true
 end
 
 return _M
