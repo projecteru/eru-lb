@@ -1,11 +1,4 @@
-local local_cache = require "resty.lrucache"
 local utils = require "utils"
-
-local cache = local_cache.new(200)
-if not cache then
-    ngx.log(ngx.ERR, "failed to create cache ", err)
-    return
-end
 
 backend, _ = cache:get(ngx.var.host)
 if not backend then
