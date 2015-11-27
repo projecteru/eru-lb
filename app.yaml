@@ -1,6 +1,6 @@
 appname: "erulb"
 entrypoints:
-    roper:
+    roper-host:
         privileged: true
         cmd: "nginx -p /erulb/server -c /erulb/conf/roper.conf"
         ports:
