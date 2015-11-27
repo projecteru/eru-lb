@@ -9,7 +9,7 @@ if ngx.var.backend == "" then
 end
 
 local host = ngx.var.host
-local status = ngx.var.upstream_status
+local status = tonumber(ngx.var.upstream_status)
 local cost = tonumber(ngx.var.upstream_response_time)
 
 local function calc_status(premature)
@@ -28,6 +28,7 @@ local function calc_status(premature)
     rds:incr(total_key)
     if not status then
         rds:incr(miss_key)
+        ngx.log(ngx.ERR, host, ' ', status, ' ', cost)
         return
     end
 

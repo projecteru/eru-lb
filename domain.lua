@@ -32,6 +32,7 @@ local function get()
         result[domain] = servernames:get(domain)
     end
     ngx.say(cjson.encode(result))
+    ngx.exit(ngx.HTTP_OK)
 end
 
 if ngx.var.request_method == 'PUT' then
