@@ -85,8 +85,11 @@ function _M.monitor(self)
             ngx.log(ngx.ERR, ' ELB disconnect from redis '..err)
             -- 重新 subscribe
             -- 重载路由表
-            update = rds:subscribe(key)
-            self:load_domain_route()
+            update = nil
+            while not update do
+                update = rds:subscribe(key)
+            end
+            self:load_route_table()
         elseif res ~= nil and res[1] == 'message' then
             local msg = res[3]
             ngx.log(ngx.NOTICE, ' ELB get message '.. msg)
@@ -104,7 +107,7 @@ function _M.monitor(self)
                         self:update_app_route_table(meta['domain'], meta['location'], backend_name)
                     end
                 elseif ctrl == config.DELETE_DOMAIN then
-                    self:delete_app_route_table(meta['domain'], meta['location']. backend_name)
+                    self:delete_app_route_table(meta['domain'], meta['location'], backend_name)
                 elseif ctrl == config.UPDATE_DOMAIN then
                     self:load_app_nodes(backend_name)
                 end

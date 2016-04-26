@@ -25,7 +25,6 @@ function _M.update_backends(backend_name, backends)
 end
 
 function _M.delete_route(route_name, backend_name)
-    local route_name = domain..'_'..location
     route_table:delete(route_name)
     local ok, err = dyups.delete(backend_name)
     if ok ~= 200 then
