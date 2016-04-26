@@ -18,7 +18,7 @@ Proxy: 8100 requests / sec (by 8 core config)
 ## Feature
 
 1. Dynamically add/remove/update backend (by ngx_http_dyups_module, part of [tengine](http://tengine.taobao.org/)).
-2. Use redis to set servernames.
+2. Use redis to store route table.
 3. Calcuate upstream status (total response, avg response time, response code count).
 
 ## Configuration
@@ -32,30 +32,6 @@ We will offer dockerfile ASAP.
 
 ## API
 
-* Add servername.
-
-```
-http PUT :8080/domain backend=aaa name=vbox
-```
-
-* Delete servername.
-
-```
-http DELETE :8080/domain name=vbox
-```
-
-* Add/Update a backend. if it not exists, the module will create it automatically.
-
-```
-http PUT :8080/upstreams backend=aaa servers:='["server 127.0.0.1:5000 weight=2;", "server 127.0.0.1:4000;"]'
-```
-
-* Delete a backend.
-
-```
-http DELETE :8080/upstreams backend=aaa
-```
-
 * Show backends detail.
 
 ```
@@ -68,7 +44,7 @@ http :8080/upstreams
 http :8080/backend/status?host=domain
 ```
 
-* Show servernames list.
+* Show domain list.
 
 ```
 http :8080/domain
