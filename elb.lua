@@ -3,6 +3,7 @@ local config = require "config"
 local redis = require "redtool"
 local router = require "router"
 local utils = require "utils"
+local lock = require "resty.lock"
 
 local _M = {}
 local mt = {
@@ -37,6 +38,12 @@ function _M.update_app_backends(self, backend_name, backends)
 end
 
 function _M.load_route_table(self)
+    local mutex = lock:new("analysis", {timeout=0, exptime=3})
+    local es, err = mutex:lock(config.INIT_TYPE)
+    if not es then
+        ngx.log(ngx.NOTICE, ' ELB init in another worker ')
+        return
+    end
     local key = self.name..':info'
     local rds = redis:new()
     local info = rds:get(key)
@@ -53,6 +60,8 @@ function _M.load_route_table(self)
             self:update_app_route_table(d['domain'], d['location'], backend_name)
         end
     end
+    -- automatic released
+    -- mutex:unlock()
 end
 
 function _M.load_app_nodes(self, backend_name)
@@ -68,6 +77,12 @@ function _M.load_app_nodes(self, backend_name)
 end
 
 function _M.monitor(self)
+    local mutex = lock:new("analysis", {timeout=0, exptime=3})
+    local es, err = mutex:lock(config.MONITOR_TYPE)
+    if not es then
+        ngx.log(ngx.NOTICE, ' ELB start monitor in another worker ')
+        return
+    end
     local key = self.name..':update'
     local rds = redis:new()
     local update = rds:subscribe(key)
@@ -116,6 +131,8 @@ function _M.monitor(self)
             end
         end
     end
+    -- automatic released
+    -- mutex:unlock()
 end
 
 return _M

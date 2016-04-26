@@ -1,4 +1,5 @@
 local elb = require 'elb'
+
 lb = elb:new()
 if lb == nil then
     ngx.log(ngx.ERR, ' init elb failed ')

@@ -9,4 +9,7 @@ _M.DELETE_DOMAIN = 'delete'
 _M.UPDATE_DOMAIN = 'update'
 _M.RELOAD = 'reload'
 
+_M.INIT_TYPE = 'init'
+_M.MONITOR_TYPE = 'monitor'
+
 return _M
