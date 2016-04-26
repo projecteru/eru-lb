@@ -1,7 +1,32 @@
 local _M = {}
 
 local analysis = ngx.shared.analysis
-local servernames = ngx.shared.servernames
+local route_table = ngx.shared.routetable
+
+function _M.split(str, sSeparator, nMax, bRegexp)
+    assert(sSeparator ~= '')
+    assert(nMax == nil or nMax >= 1)
+
+    local aRecord = {}
+
+    if str:len() > 0 then
+        local bPlain = not bRegexp
+        nMax = nMax or -1
+
+        local nField=1 nStart=1
+        local nFirst,nLast = str:find(sSeparator, nStart, bPlain)
+        while nFirst and nMax ~= 0 do
+            aRecord[nField] = str:sub(nStart, nFirst-1)
+            nField = nField+1
+            nStart = nLast+1
+            nFirst,nLast = str:find(sSeparator, nStart, bPlain)
+            nMax = nMax-1
+        end
+        aRecord[nField] = str:sub(nStart)
+    end
+
+    return aRecord
+end
 
 function _M.read_data()
     ngx.req.read_body()
@@ -12,12 +37,8 @@ function _M.read_data()
     return data
 end
 
-function _M.get_from_servernames(host)
-    local value = servernames:get(host)
-    if not value then
-        ngx.log(ngx.ERR, "no such backend")
-        ngx.exit(ngx.HTTP_NOT_FOUND)
-    end
+function _M.get_from_route_table(key)
+    local value = route_table:get(key)
     return value
 end
 

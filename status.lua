@@ -71,7 +71,7 @@ local function calc_status(host)
 end
 
 local host = ngx.var.arg_host
-utils.get_from_servernames(host)
+utils.get_from_route_table(host)
 
 local result, err = calc_status(host)
 if err then
