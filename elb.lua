@@ -44,7 +44,7 @@ function _M.load_route_table(self)
         ngx.log(ngx.NOTICE, ' ELB init in another worker ')
         return
     end
-    local key = self.name..':info'
+    local key = config.REDIS_PREFIX..self.name..':info'
     local rds = redis:new()
     local info = rds:get(key)
     if not info then
@@ -66,7 +66,7 @@ end
 
 function _M.load_app_nodes(self, backend_name)
     local rds = redis:new()
-    local backends = rds:lrange(backend_name, 0, 01)
+    local backends = rds:lrange(backend_name, 0, -1)
     if not backends then
         ngx.log(ngx.ERR, ' ELB get none app backends '..backend_name)
         return false
@@ -83,7 +83,7 @@ function _M.monitor(self)
         ngx.log(ngx.NOTICE, ' ELB start monitor in another worker ')
         return
     end
-    local key = self.name..':update'
+    local key = config.REDIS_PREFIX..self.name..':update'
     local rds = redis:new()
     local update = rds:subscribe(key)
     if not update then
@@ -114,7 +114,7 @@ function _M.monitor(self)
             ngx.log(ngx.NOTICE, ctrl..' app '..meta['appname'])
 
             if ctrl ~= config.RELOAD then
-                local backend_name = meta['appname']..'_'..meta['version']..'_'..meta['entrypoint']..'_'..meta['pod']
+                local backend_name = config.REDIS_PREFIX..meta['appname']..'_'..meta['version']..'_'..meta['entrypoint']..'_'..meta['pod']
                 if ctrl == config.ADD_DOMAIN then
                     -- 先抓对应的后端, 更新 upstream
                     if self:load_app_nodes(backend_name) then

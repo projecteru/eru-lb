@@ -17,13 +17,13 @@ local function calc_status(premature)
         return
     end
     local rds = redis:new()
-    local status_key = "erulb:"..host..":status"
-    local cost_key = "erulb:"..host..":cost"
-    local total_key = "erulb:"..host..":count"
-    local miss_key = "erulb:"..host..":miss"
-    local hit_key = "erulb:"..host..":hit"
-    local wrong_key = "erulb:"..host..":wrong"
-    local right_key = "erulb:"..host..":right"
+    local status_key = config.REDIS_PREFIX.."erulb:"..host..":status"
+    local cost_key = config.REDIS_PREFIX.."erulb:"..host..":cost"
+    local total_key = config.REDIS_PREFIX.."erulb:"..host..":count"
+    local miss_key = config.REDIS_PREFIX.."erulb:"..host..":miss"
+    local hit_key = config.REDIS_PREFIX.."erulb:"..host..":hit"
+    local wrong_key = config.REDIS_PREFIX.."erulb:"..host..":wrong"
+    local right_key = config.REDIS_PREFIX.."erulb:"..host..":right"
 
     rds:incr(total_key)
     if not status then
